@@ -11,11 +11,17 @@ public class GestureManager : MonoBehaviour
 
     public EventHandler<TapEventArgs> OnTap;
     public EventHandler<SwipeEventArgs> OnSwipe;
+    public EventHandler<DragEventArgs> OnDrag;
     public EventHandler<TwoFingerPanEventArgs> OnTwoFingerPan;
+    public EventHandler<SpreadEventArgs> OnSpread;
+    public EventHandler<RotateEventArgs> OnRotate;
 
     public TapProperty _tapProperty;
     public SwipeProperty _swipeProperty;
+    public DragProperty _dragProperty;
     public TwoFingerPanProperty _twoFingerPanProperty;
+    public SpreadProperty _spreadProperty;
+    public RotateProperty _rotateProperty;
 
     private Vector2 startPoint = Vector2.zero;
     private Vector2 endPoint = Vector2.zero;
@@ -50,6 +56,37 @@ public class GestureManager : MonoBehaviour
                 {
                     FireTwoFingerPanEvent();
                 }
+                // Spread Event
+                if (trackedFinger1.phase == TouchPhase.Moved || trackedFinger2.phase == TouchPhase.Moved)
+                {
+                    Vector2 prevPoint1 = GetPreviousPoint(trackedFinger1);
+                    Vector2 prevPoint2 = GetPreviousPoint(trackedFinger2);
+
+                    float currDistance = Vector2.Distance(trackedFinger1.position, trackedFinger2.position);
+                    float prevDistance = Vector2.Distance(prevPoint1, prevPoint2);
+
+                    if (Math.Abs(currDistance - prevDistance) >= _spreadProperty.MinDistanceChange * Screen.dpi)
+                    {
+                        FireSpreadEvent(currDistance - prevDistance);
+                    }
+                }
+                // Rotate Event
+                if ((trackedFinger1.phase == TouchPhase.Moved || trackedFinger2.phase == TouchPhase.Moved)
+                    && Vector2.Distance(trackedFinger1.position, trackedFinger2.position) >= _rotateProperty.minDistance * Screen.dpi) 
+                {
+                    Vector2 prevPoint1 = GetPreviousPoint(trackedFinger1);
+                    Vector2 prevPoint2 = GetPreviousPoint(trackedFinger2);
+
+                    Vector2 diffVector = trackedFinger1.position - trackedFinger2.position;
+                    Vector2 prevDiffVector = prevPoint1 - prevPoint2;
+
+                    float angle = Vector2.Angle(prevDiffVector, diffVector);
+
+                    if (angle >= _rotateProperty.minChange)
+                    {
+                        FireRotateEvent(diffVector, prevDiffVector, angle);
+                    }
+                }
             }
         }
     }
@@ -81,6 +118,11 @@ public class GestureManager : MonoBehaviour
         else
         {
             gestureTime += Time.deltaTime;
+            // Drag Gesture
+            if (gestureTime >= _dragProperty.bufferTime)
+            {
+                FireDragEvent();
+            }
         }
     }
 
@@ -171,6 +213,35 @@ public class GestureManager : MonoBehaviour
 
     }
 
+
+    private void FireDragEvent()
+    {
+        Debug.Log("Drag");
+
+        Ray r = Camera.main.ScreenPointToRay(trackedFinger1.position);
+        RaycastHit hit;
+        GameObject hitObj = null;
+
+        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        {
+            hitObj = hit.collider.gameObject;
+        }
+
+        DragEventArgs dragEvent = new DragEventArgs(trackedFinger1, hitObj);
+
+        if (OnDrag != null)
+        {
+            OnDrag(this, dragEvent);
+        }
+
+        if (hitObj != null)
+        {
+            IDraggable draggable = hitObj.GetComponent<IDraggable>();
+            if (draggable != null)
+                draggable.OnDrag(dragEvent);
+        }
+    }
+
     private void FireTwoFingerPanEvent()
     {
         TwoFingerPanEventArgs args = new TwoFingerPanEventArgs(trackedFinger1, trackedFinger2);
@@ -180,6 +251,78 @@ public class GestureManager : MonoBehaviour
         }
     }
 
+    private Vector2 GetPreviousPoint(Touch finger)
+    {
+        return finger.position - finger.deltaPosition;
+    }
+
+    private Vector2 GetMidpoint(Vector2 p1, Vector2 p2)
+    {
+        return (p1 + p2) / 2;
+    }
+
+    private void FireSpreadEvent(float distDelta)
+    {
+        if (distDelta > 0)
+        {
+            Debug.Log("Spread");
+        }
+        else
+        {
+            Debug.Log("Pinch");
+        }
+
+        Vector2 midpoint = GetMidpoint(trackedFinger1.position, trackedFinger2.position);
+
+        Ray r = Camera.main.ScreenPointToRay(midpoint);
+        RaycastHit hit;
+        GameObject hitObj = null;
+        Debug.DrawRay(r.origin, r.direction * 100f, Color.red, 5f);
+        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        {
+            hitObj = hit.collider.gameObject;
+            Debug.Log("Hit object");
+        }
+
+        SpreadEventArgs args = new SpreadEventArgs(trackedFinger1, trackedFinger2, distDelta, hitObj);
+
+        if (OnSpread != null)
+        {
+            OnSpread(this, args);
+        }
+
+        if (hitObj != null)
+        {
+            ISpreadable spreadable = hitObj.GetComponent<ISpreadable>();
+            if (spreadable != null)
+            {
+                Debug.Log("Spreadable hit");
+                spreadable.OnSpread(args);
+            }
+        }
+    }
+
+    private void FireRotateEvent(Vector2 diffVector, Vector2 prevDiffVector, float angle)
+    {
+        // Rotate event
+        Debug.Log("Successful Rotate");
+        Vector3 cross = Vector3.Cross(prevDiffVector, diffVector);
+        RotateDirection dir;
+        if (cross.z > 0)
+        {
+            Debug.Log($"Rotate CCW {angle}");
+            dir = RotateDirection.CCW;
+        }
+        else
+        {
+            Debug.Log($"Rotate CW {angle}");
+            dir = RotateDirection.CW;
+        }
+
+        GameObject hitObj = null;
+
+        RotateEventArgs args = new RotateEventArgs(trackedFinger1, trackedFinger2, angle, dir, hitObj);
+    }
 
     private void OnDrawGizmos()
     {
@@ -204,5 +347,6 @@ public class GestureManager : MonoBehaviour
                 }
             }
         }
+
     }
 }

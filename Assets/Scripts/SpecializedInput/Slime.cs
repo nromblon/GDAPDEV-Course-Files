@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slime : MonoBehaviour, ITappable, ISwipeable
+public class Slime : MonoBehaviour, ITappable, ISwipeable, IDraggable, ISpreadable
 {
     public float speed = 10f;
+    public float sizeSpeed = 1f;
     private Vector3 targetPos = Vector3.zero;
 
     private void OnEnable()
@@ -27,5 +28,29 @@ public class Slime : MonoBehaviour, ITappable, ISwipeable
         Vector3 dir = Vector3.Normalize(e.SwipeVector);
 
         targetPos += dir * 5;
+    }
+
+    public void OnDrag(DragEventArgs e)
+    {
+        if (e.HitObject != gameObject)
+            return;
+
+        Ray r = Camera.main.ScreenPointToRay(e.TargetFinger.position);
+
+        float distanceToCamera = Vector3.Distance(transform.position, Camera.main.transform.position);
+        Vector3 newPoint = r.GetPoint(5);
+        targetPos = newPoint;
+        transform.position = newPoint;
+    }
+
+    public void OnSpread(SpreadEventArgs e)
+    {
+        if (e.HitObject != gameObject)
+            return;
+
+        Debug.Log("Slime hit");
+        float scale = (e.DistanceDelta / Screen.dpi) * sizeSpeed;
+        Vector3 scaleVector = new Vector3(scale, scale, scale);
+        transform.localScale += scaleVector;
     }
 }
