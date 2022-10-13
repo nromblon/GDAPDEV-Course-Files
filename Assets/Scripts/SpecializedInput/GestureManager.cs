@@ -318,10 +318,26 @@ public class GestureManager : MonoBehaviour
             Debug.Log($"Rotate CW {angle}");
             dir = RotateDirection.CW;
         }
-
         GameObject hitObj = null;
+        Vector2 mid = GetMidpoint(trackedFinger1.position, trackedFinger2.position);
+        Ray r = Camera.main.ScreenPointToRay(mid);
+        RaycastHit hit;
+
+        if (Physics.Raycast(r, out hit, Mathf.Infinity))
+        {
+            hitObj = hit.collider.gameObject;
+        }
 
         RotateEventArgs args = new RotateEventArgs(trackedFinger1, trackedFinger2, angle, dir, hitObj);
+        if (OnRotate != null)
+            OnRotate(this, args);
+
+        if (hitObj != null)
+        {
+            IRotateable rotateable = hitObj.GetComponent<IRotateable>();
+            if (rotateable != null)
+                rotateable.OnRotate(args);
+        }
     }
 
     private void OnDrawGizmos()

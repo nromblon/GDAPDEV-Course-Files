@@ -402,7 +402,10 @@ MonoBehaviour:
   _twoFingerPanProperty:
     maxDistance: 0.8
   _spreadProperty:
-    MinDistanceChange: 0.1
+    MinDistanceChange: 0.04
+  _rotateProperty:
+    minDistance: 0.75
+    minChange: 0.4
 --- !u!4 &1364336807
 Transform:
   m_ObjectHideFlags: 0
