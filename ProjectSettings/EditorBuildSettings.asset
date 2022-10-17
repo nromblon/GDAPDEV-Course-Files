@@ -12,9 +12,12 @@ EditorBuildSettings:
     path: 
     guid: 00000000000000000000000000000000
   - enabled: 0
-    path: Assets/_Scenes/Sensors.unity
-    guid: d41a6b38157753844b6a2be29f34465b
-  - enabled: 1
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
     path: Assets/_Scenes/SensorsLecture.unity
     guid: b2e5cad46e155ae47a17d320c6390422
+  - enabled: 1
+    path: Assets/_Scenes/HO_Gestures-and-Sensors/HO_GesturesSensors.unity
+    guid: b084fea8dce5aac4fb85d52efcd58b45
   m_configObjects: {}

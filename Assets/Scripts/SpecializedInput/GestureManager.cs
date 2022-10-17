@@ -129,27 +129,26 @@ public class GestureManager : MonoBehaviour
     private void FireTapEvent(Vector2 pos)
     {
         Debug.Log("Tap!");
+        GameObject hitObj = null;
+        Ray r = Camera.main.ScreenPointToRay(pos);
+        RaycastHit hit;
+        if (Physics.Raycast(r, out hit, Mathf.Infinity)) {
+            hitObj = hit.collider.gameObject;
+        }
+
+        TapEventArgs tapArgs = new TapEventArgs(pos, hitObj);
+        // Notify tap listeners with tap event
         // Check if anything is listening first
         if (OnTap != null)
-        {
-            GameObject hitObj = null;
-            Ray r = Camera.main.ScreenPointToRay(pos);
-            RaycastHit hit;
-
-            if (Physics.Raycast(r, out hit, Mathf.Infinity)) {
-                hitObj = hit.collider.gameObject;
-            }
-
-            TapEventArgs tapArgs = new TapEventArgs(pos, hitObj);
-            // Notify tap listeners with tap event
             OnTap(this, tapArgs);
 
-            // If the hit object is tappable, call its OnTap method
-            if (hitObj != null)
+        // If the hit object is tappable, call its OnTap method
+        if (hitObj != null)
+        {
+            ITappable tappable = hitObj.GetComponent<ITappable>();
+            if (tappable != null)
             {
-                ITappable tappable = hitObj.GetComponent<ITappable>();
-                if (tappable != null)
-                    tappable.OnTap();
+                tappable.OnTap();
             }
         }
     }
