@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Slime
+  m_EditorClassIdentifier: 
+  m_GroupName: Slime
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 55f88fef8bce75c4f887558f69e2f793
+  m_SerializeEntries:
+  - m_GUID: 64d9e7a9771802f4eab391b96e2f6fa8
+    m_Address: Slime.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - character
+    - Slime
+  - m_GUID: a9f6db0fbbe0c8740bc8ac418a88aba5
+    m_Address: Slime/spritesheet.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Slime
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 5cea77826802e25489fb1b6b0cf71e4a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: fadc95ee12f0bc849ae526bee3c5515f, type: 2}
+    - {fileID: 11400000, guid: 7539b0d0f44a9d04684ccee084bd2c31, type: 2}
