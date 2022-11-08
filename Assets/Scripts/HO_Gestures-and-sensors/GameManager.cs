@@ -9,9 +9,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SliceableSpawner spawner;
     [SerializeField] private TextMeshProUGUI highScoreTxt;
     [SerializeField] private TextMeshProUGUI scoreTxt;
+    [SerializeField] private GameObject pausePanel;
+
     private float highScore = 0f;
     private float score = 0f;
 
+    private float prevTime;
 
     private void Awake()
     {
@@ -55,5 +58,28 @@ public class GameManager : MonoBehaviour
         spawner.StopSpawning();
         highScoreTxt.SetText($"High Score: None");
         scoreTxt.SetText($"Score: N/A");
+    }
+
+    public void Pause()
+    {
+        prevTime = Time.timeScale;
+        Time.timeScale = 0f;
+        GestureManager.Instance.isEnabled = false;
+    }
+
+    public void Resume()
+    {
+        Time.timeScale = prevTime;
+        GestureManager.Instance.isEnabled = true;
+    }
+
+    public void OnApplicationPause(bool pause)
+    {
+        Debug.Log($"Application Pause: {pause}");
+        if (pause)
+        {
+            pausePanel.SetActive(true);
+            Pause();
+        }
     }
 }

@@ -23,6 +23,8 @@ public class GestureManager : MonoBehaviour
     public SpreadProperty _spreadProperty;
     public RotateProperty _rotateProperty;
 
+    public bool isEnabled = true;
+
     private Vector2 startPoint = Vector2.zero;
     private Vector2 endPoint = Vector2.zero;
     // Total time of the gesture
@@ -42,6 +44,9 @@ public class GestureManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isEnabled)
+            return;
+
         if (Input.touchCount > 0)
         {
             if (Input.touchCount == 1)
