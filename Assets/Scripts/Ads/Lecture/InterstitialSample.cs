@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Advertisements;
+using Newtonsoft.Json;
 
 public class InterstitialSample : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
-    public static EventHandler<RewardEventArgs> RewardAdCompleted;
     [SerializeField] string _androidAdUnitId = "Interstitial_Android";
     [SerializeField] string _iOSAdUnitId = "Interstitial_iOS";
     string _adUnitId;
@@ -60,11 +60,7 @@ public class InterstitialSample : MonoBehaviour, IUnityAdsLoadListener, IUnityAd
     {
         if (placementId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsCompletionState.COMPLETED))
         {
-            // Reward
-            if (RewardAdCompleted != null)
-                RewardAdCompleted.Invoke()
         }
-        Advertisement.Load()
     }
 
     public void OnUnityAdsShowStart(string placementId) { }
